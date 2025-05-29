@@ -51,7 +51,4 @@ router.post('/signup',async(req,res)=>{
     return res.redirect('/');
 })
 
-
-
-
 module.exports=router
