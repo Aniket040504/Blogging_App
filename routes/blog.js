@@ -1,8 +1,13 @@
 const {Router}= require("express");
 const multer=require('multer');
+
 const Blog=require('../model/blog');
+const Comment=require('../model/comment');
+
 const router=Router();
 const path=require('path');
+
+// MULTER FUNCTION TO STORE IMAGES IN DB
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -17,11 +22,21 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 
+// @desc 
+// @routes
+// access
+
 router.get('/add-new', (req,res)=>{
     return res.render('addBlog',{
         user:req.user,
     })
 })
+
+
+// @desc
+// @routes
+// access
+
 
 router.get('/:id', async(req,res)=>{
   const blog=await Blog.findById(req.params.id).populate("createdBy");
@@ -30,6 +45,11 @@ router.get('/:id', async(req,res)=>{
     blog,
   })
 })
+
+
+// @desc
+// @routes
+// access
 
 router.post('/', upload.single("coverImage"), async(req,res)=>{
     const {title,body} =req.body;
@@ -41,5 +61,23 @@ router.post('/', upload.single("coverImage"), async(req,res)=>{
     })
     return res.redirect(`/blog/${blog._id}`)
 })
+
+
+/// ADDING COMMENTS
+
+
+// @desc
+// @routes
+// access
+
+
+router.post("/comment/:blogId", async (req, res) => {
+  await Comment.create({
+    content: req.body.content,
+    blogId: req.params.blogId,
+    createdBy: req.user._id,
+  });
+  return res.redirect(`/blog/${req.params.blogId}`);
+});
 
 module.exports=router
