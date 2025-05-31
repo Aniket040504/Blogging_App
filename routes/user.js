@@ -3,14 +3,36 @@ const User=require("../model/user")
 
 const router=Router();
 
+
+// @desc 
+// @routes
+// access
+
 router.get('/signin',(req,res)=>{
+    try{
     return res.render("signin");
+} catch(err){
+    console.log(err);
+}
 })
+
+// @desc 
+// @routes
+// access
 
 
 router.get('/signup',(req,res)=>{
+    try{
     return res.render("signup");
+} catch(err){
+    console.log(err);
+}
 })
+
+
+// @desc 
+// @routes
+// access
 
 
 router.get('/logout', (req, res, next) => {
@@ -23,6 +45,9 @@ router.get('/logout', (req, res, next) => {
   }
 });
 
+// @desc 
+// @routes
+// access
 
 router.post('/signin' , async(req,res)=>{
     try{
@@ -40,8 +65,12 @@ router.post('/signin' , async(req,res)=>{
 
 })
 
+// @desc 
+// @routes
+// access
 
 router.post('/signup',async(req,res)=>{
+    try{
     const {fullName,email,password}=req.body;
     await User.create({
         fullName,
@@ -49,6 +78,13 @@ router.post('/signup',async(req,res)=>{
         password,
     });
     return res.redirect('/');
+} catch(err){
+    console.log(err);
+     return res.render('signup',{
+            error: "Kindly enter all credentials",
+        }
+)}
 })
+
 
 module.exports=router

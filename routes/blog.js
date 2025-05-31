@@ -26,9 +26,13 @@ const upload = multer({ storage: storage })
 // access
 
 router.get('/add-new', (req,res)=>{
+  try{
     return res.render('addBlog',{
         user:req.user,
     })
+  } catch(err){
+    console.log(err);
+  }
 })
 
 /// ADDING COMMENTS
@@ -40,12 +44,16 @@ router.get('/add-new', (req,res)=>{
 
 
 router.post("/comment/:blogId", async (req, res) => {
+  try{
   await Comment.create({
     content: req.body.content,
     blogId: req.params.blogId,
     createdBy: req.user._id,
   });
   return res.redirect(`/blog/${req.params.blogId}`);
+} catch(err){
+  console.log(err);
+}
 });
 
 // @desc
@@ -53,6 +61,7 @@ router.post("/comment/:blogId", async (req, res) => {
 // access
 
 router.post('/', upload.single("coverImage"), async(req,res)=>{
+  try{
     const {title,body} =req.body;
     const blog= await Blog.create({
         body,
@@ -61,6 +70,9 @@ router.post('/', upload.single("coverImage"), async(req,res)=>{
         coverImageURL: `uploads/${req.file.filename}`,
     })
     return res.redirect(`/blog/${blog._id}`)
+  }catch(err){
+    console.log(err);
+  }
 })
 
 // @desc
@@ -69,7 +81,7 @@ router.post('/', upload.single("coverImage"), async(req,res)=>{
 
 
 router.get('/:id', async(req,res)=>{
-  console.log("route hit");
+  try{
   const blog=await Blog.findById(req.params.id).populate("createdBy");
   const comments=await Comment.find({blogId:req.params.id}).populate("createdBy");
   console.log(comments)
@@ -78,6 +90,9 @@ router.get('/:id', async(req,res)=>{
     blog,
     comments,
   })
+} catch(err){
+  console.log(err);
+}
 })
 
 module.exports=router
