@@ -21,7 +21,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
-
 // @desc 
 // @routes
 // access
@@ -31,37 +30,6 @@ router.get('/add-new', (req,res)=>{
         user:req.user,
     })
 })
-
-
-// @desc
-// @routes
-// access
-
-
-router.get('/:id', async(req,res)=>{
-  const blog=await Blog.findById(req.params.id).populate("createdBy");
-  return res.render('blog',{
-    user:req.user,
-    blog,
-  })
-})
-
-
-// @desc
-// @routes
-// access
-
-router.post('/', upload.single("coverImage"), async(req,res)=>{
-    const {title,body} =req.body;
-    const blog= await Blog.create({
-        body,
-        title,
-        createdBy: req.user._id,
-        coverImageURL: `uploads/${req.file.filename}`,
-    })
-    return res.redirect(`/blog/${blog._id}`)
-})
-
 
 /// ADDING COMMENTS
 
@@ -79,5 +47,37 @@ router.post("/comment/:blogId", async (req, res) => {
   });
   return res.redirect(`/blog/${req.params.blogId}`);
 });
+
+// @desc
+// @routes
+// access
+
+router.post('/', upload.single("coverImage"), async(req,res)=>{
+    const {title,body} =req.body;
+    const blog= await Blog.create({
+        body,
+        title,
+        createdBy: req.user._id,
+        coverImageURL: `uploads/${req.file.filename}`,
+    })
+    return res.redirect(`/blog/${blog._id}`)
+})
+
+// @desc
+// @routes
+// access
+
+
+router.get('/:id', async(req,res)=>{
+  console.log("route hit");
+  const blog=await Blog.findById(req.params.id).populate("createdBy");
+  const comments=await Comment.find({blogId:req.params.id}).populate("createdBy");
+  console.log(comments)
+  return res.render('blog',{
+    user:req.user,
+    blog,
+    comments,
+  })
+})
 
 module.exports=router
